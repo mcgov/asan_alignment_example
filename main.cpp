@@ -9,7 +9,11 @@ int main () {
     size_t *p4 = myAllocator.allocate(4);
     
     //myAllocator.deallocate(p3,3);
-    p3[3] = 0x10;
+    p2[2] = 0xFF;
+    p3[-1] = 0xFF;
+    p3[3] = 0xFF;
+    p4[-1] = 0xFF;
+
 
     return 1;
 }

@@ -11,18 +11,16 @@ int main()
 
     // try to unpoison a small chunk at the end of a qword 
     //   and two leading bytes from the next qword.
-    // This ends up unpoisoning more than it should.
+    // This ends up unpoisoning more of the first qword 
+    //  than it should.
     ASAN_UNPOISON_MEMORY_REGION(array+4, 6);
 
     // try to re-poison the same area, 
-    //  which sort of works but doesn't fix the mistake from the last unpoison.
+    //  Note, this sort of works but isn't commutative.
+    // ie the mistake from the first poisoning isn't fixed.
+    // the leading bytes remain unpoisoned after the operation.
     ASAN_POISON_MEMORY_REGION(array+4, 6);
 
-    // re-poison the first four bytes of the region.
-    ASAN_POISON_MEMORY_REGION(array, 4);
-
-    ASAN_UNPOISON_MEMORY_REGION(array+6, 3);
-
-    ASAN_UNPOISON_MEMORY_REGION(array+11, 2);
-
+    array[0] = 0xff; //this access should be poisoned, but it's not!
 }
+
