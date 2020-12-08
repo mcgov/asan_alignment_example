@@ -46,32 +46,7 @@ template <class T> T *ArenaAllocator<T>::allocate(const size_t n) const {
   size_t size_plus_padding = (sizeof(T) * n) + PaddingSize;
 
   /*
-   ASan poisoning has alignment requirements, we must align padding such that
-   the padding ends on a byte boundary in the shadow memory.
-
-   This requirement is a little clearer when you look at the shadow memory
-   itself.
-
-   When compiled on x86 and size_t size is 4, the shadow memory that is
-   generated for this example in main.cpp will look something like this: f7 f7
-   04 00 f7 00 04 00 00 f7 f7 |p1| p2 |  p3  | p4    |
-   Element p1 is 4 bytes large, so it will only take up a nibble of shadow
-   memory. Element p2 is 8 bytes large and will take up a full byte of shadow
-   memory.
-
-   The issue is that the padding for this element would normally only take up a
-   nibble of shadow space. This would require asan to poison only the higher
-   order nibble of this shadow memory, which is not supported.
-
-   Note the poisoned region after p2 is a full byte, rather than just a nibble.
-   Without this padding to ensure alignment, ASan will not just fail to poison
-   the most significant nibble, it will do it silently! This will result in
-   false positive and missed bug reports.
-
-   When manually implementing shadow memory poisoning for a custom allocator,
-   users must ensure that elements and padding (combined) are quadword (8 bytes)
-   aligned.
-
+    `nmake aligned` to build the example with the correct padding.
   */
 #ifdef APPLY_8_BYTE_ALIGNMENT
   if (size_plus_padding % 8 != 0)
