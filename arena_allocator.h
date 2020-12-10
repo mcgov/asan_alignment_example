@@ -5,12 +5,24 @@
 #include <stdlib.h> //size_t, malloc, free
 
 // NOTE: This is a non-thread-safe, completely contrived example to
-//  illustrate ASan's alignment requirements.
+//  illustrate ASan's alignment requirements. Do not attempt to use
+//  this for anything other than this example!
 
+// NOTE: This example does not apply padding in between items, since std::allocator
+// doesn't allow for intra-object padding.
+
+// The allocator will have a fixed size:
 const static size_t ArenaSize = 0x10000;
-static char __declspec(align(16)) Arena[ArenaSize];
-static size_t cursor = 0x10; // start slightly inside the Arena
+// a fixed arena region which will contain the allocations.
+static char alignas(16) Arena[ArenaSize];
+// a cursor which will encode the start of the next allocation.
+static size_t cursor = 0x10; // starting slightly inside the Arena
+// and a minimum padding size, arbitrarily we'll use the size of a pointer.
 static const size_t PaddingSize = sizeof(void *);
+
+// This example allocator is based on the std::allocator interface,
+// the example is also basically stolen from the 'mallocator' example
+// https://devblogs.microsoft.com/cppblog/the-mallocator/
 
 template <class T> struct ArenaAllocator {
   typedef T value_type;
@@ -47,11 +59,14 @@ template <class T> T *ArenaAllocator<T>::allocate(const size_t n) const {
 
   /*
     `nmake aligned` to build the example with the correct padding.
+    `nmake unaligned` to build without the correct padding.
   */
-#ifdef APPLY_8_BYTE_ALIGNMENT
+
+#ifndef IGNORE_PADDING_REQUIREMENT
   if (size_plus_padding % 8 != 0)
     size_plus_padding += 8 - (size_plus_padding % 8);
 #endif 
+
   cursor += size_plus_padding;
   // unpoison the new memory, not including the padding.
   ASAN_UNPOISON_MEMORY_REGION(new_alloc, n * sizeof(T));

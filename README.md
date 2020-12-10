@@ -2,16 +2,16 @@
 
    ASan poisoning has alignment requirements, we must align padding such that the padding ends on a byte boundary in the shadow memory.
 
-   This requirement is a little clearer when you look at the shadow memory
-   itself.
+   This requirement is a little more clear when you look at the shadow memory itself.
 
-   After compiling for x86 and size_t size is 4, the shadow memory that is
-   generated for this example in main.cpp will look something like this: 
+   After compiling for x86 where sizeif(size_t) is 4, the shadow memory that is generated for this example in main.cpp will look something like this: 
 
 ```
    f7 f7 04 00 f7 00 04 00 00 f7
 ```
-    Each bit in the shadow memory encodes the accesibility of a byte of actual memory. This example has :
+
+Each bit in the shadow memory encodes the accesibility of a byte of actual memory. This example has :
+
     16 bytes of padding to start (f7 f7).
     4 bytes of accesible memory with 4 bytes of padding (04)
     8 bytes of accessible memory (00)
@@ -19,9 +19,9 @@
     12 bytes of accesible memory followed by 4 bytes of padding (00 04)
     16 bytes of accessible memory (00 00)
     8 bytes of padding (f7)
-
-   Element p1 is 4 bytes large, so it will only take up a nibble of shadow
-   memory, this is the 04 you see when reading from the right. This 04 means that only the 4 most significant bytes of the qword are accessable. The rest of the bytes in that qword are unaddressable.
+   
+Element p1 is 4 bytes large, so it will only take up a nibble of shadow
+   memory, this is the 04 you see when reading from the left. This 04 means that only the 4 most significant bytes of the qword are accessable. The rest of the bytes in that qword are unaddressable.
    Let's use a small byte array as an example, we'll set it at address 0 and use a 32 bit address space for this example.
 
    0x00000000 : [ 0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77 ] ...
