@@ -36,5 +36,8 @@ int main()
 
     array[0] = 0xff; //you might expect this access to be 
     // partially poisoned, but it's not!
+
+    // Key Takeaway: ensuring the proper alignment of your elements
+    //  and padding is essential when asan-izing your allocators.
 }
 
