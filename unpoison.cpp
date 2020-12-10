@@ -2,12 +2,13 @@
 #include "sanitizer/asan_interface.h"
 
 
-static __declspec(align(0x1000)) char array[0x100000];
+constexpr size_t array_size = 0x1000;
+static char array[array_size];
 
 int main()
 {
     // start the program by poisoning the whole region.
-    ASAN_POISON_MEMORY_REGION(array, 0x100000);
+    ASAN_POISON_MEMORY_REGION(array, array_size);
 
     // try to unpoison a small chunk at the end of a qword 
     //   and two leading bytes from the next qword.
