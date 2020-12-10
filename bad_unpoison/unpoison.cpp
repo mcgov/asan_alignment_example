@@ -1,4 +1,3 @@
-#define __SANITIZE_ADDRESS__ 
 #include "sanitizer/asan_interface.h"
 
 
@@ -16,6 +15,7 @@ int main()
     //  than it should.
     ASAN_UNPOISON_MEMORY_REGION(array+4, 6);
 
+    // note shadow memory snippets are from x86.
     // 30045000  00 02 f7 f7 f7 f7 f7 f7
     //            ^
     // by unpoisoning the end of the first qword,
@@ -28,11 +28,13 @@ int main()
 
     // 30045000  04 f7 f7 f7 f7 f7 f7 f7
 
-    // all of these attempts to unpoison the first few bytes 
+    // All of these attempts to unpoison the first few bytes 
     // of the allocation will fail to poison anything.
     ASAN_POISON_MEMORY_REGION(array,1);
     ASAN_POISON_MEMORY_REGION(array,2);
     ASAN_POISON_MEMORY_REGION(array,3);
+    
+    // 30045000  04 f7 f7 f7 f7 f7 f7 f7
 
     array[0] = 0xff; //you might expect this access to be 
     // partially poisoned, but it's not!
