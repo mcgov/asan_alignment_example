@@ -61,5 +61,6 @@ template <class T> T *ArenaAllocator<T>::allocate(const size_t n) const {
 
 template <class T>
 void ArenaAllocator<T>::deallocate(T *const p, size_t s) const noexcept {
+  // repoison the entire region
   ASAN_POISON_MEMORY_REGION(p, s * alignof(T));
 }
