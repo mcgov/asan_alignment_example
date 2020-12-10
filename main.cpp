@@ -7,12 +7,11 @@ int main () {
     size_t *two = myAllocator.allocate(2);
     size_t *three = myAllocator.allocate(3);
     size_t *four = myAllocator.allocate(4);
-    
+
     two[2] = 0xFF;
     three[-1] = 0xFF;
     three[3] = 0xFF;
     four[-1] = 0xFF;
-
 
     return 1;
 }

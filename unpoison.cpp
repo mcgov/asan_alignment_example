@@ -15,12 +15,25 @@ int main()
     //  than it should.
     ASAN_UNPOISON_MEMORY_REGION(array+4, 6);
 
-    // try to re-poison the same area, 
-    //  Note, this sort of works but isn't commutative.
-    // ie the mistake from the first poisoning isn't fixed.
-    // the leading bytes remain unpoisoned after the operation.
+    // 30045000  00 02 f7 f7 f7 f7 f7 f7
+    //            ^
+    // by unpoisoning the end of the first qword,
+    // we've inadvertently unpoisoned the entire region.
+
+    // re-poison the area we just poisoned,
+    // note the mistake from the first poisoning isn't fixed.
+    // the leading bytes remain unpoisoned after this operation.
     ASAN_POISON_MEMORY_REGION(array+4, 6);
 
-    array[0] = 0xff; //this access should be poisoned, but it's not!
+    // 30045000  04 f7 f7 f7 f7 f7 f7 f7
+
+    // all of these attempts to unpoison the first few bytes 
+    // of the allocation will fail to poison anything.
+    ASAN_POISON_MEMORY_REGION(array,1);
+    ASAN_POISON_MEMORY_REGION(array,2);
+    ASAN_POISON_MEMORY_REGION(array,3);
+
+    array[0] = 0xff; //you might expect this access to be 
+    // partially poisoned, but it's not!
 }
 

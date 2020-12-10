@@ -1,13 +1,14 @@
 INCLUDE=$(INCLUDE);$(VCTOOLSINSTALLDIR)crt\src
 
-unaligned:
-	cl main.cpp /fsanitize=address /Fe:unaligned.exe /Z7 /Od /D__SANITIZE_ADDRESS__ /DIGNORE_PADDING_REQUIREMENT /link /inferasanlibs
+COMMON_CL_FLAGS=/fsanitize=address  /Z7 /Od /D__SANITIZE_ADDRESS__ /D_ENABLE_EXTENDED_ALIGNED_STORAGE
 
 aligned:
-	cl main.cpp /fsanitize=address /Fe:aligned.exe /Z7 /Od /D__SANITIZE_ADDRESS__ T /link /inferasanlibs
+	cl main.cpp  /Fe:aligned.exe $(COMMON_CL_FLAGS) /link /inferasanlibs
 
 unpoison:
 	cl unpoison.cpp /fsanitize=address /Od /Z7 /link /inferasanlibs
 
+all: aligned unpoison 
+
 clean:
-	del *.obj *.exe *.lib *.exp *.pdb
+	del *.obj *.exe *.lib *.exp *.pdb *.ilk
