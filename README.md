@@ -1,6 +1,6 @@
 # Manual ASan poisoning and alignment
 
-ASan poisoning has alignment requirements, we must align padding such that the padding ends on a byte boundary in the shadow memory. This means **the size + padding for each element must align on a 16 byte boundary.**
+ASan poisoning has alignment requirements, we must align padding such that the padding ends on a byte boundary in the shadow memory. This means **the size + padding for each element must align on a 8 byte boundary.**
 
 See the included examples for a little background. One is a small program to show what can go wrong with manual shadow memory poisoning. The second is an example implementation of manual poising using `std::aligned_storage` and `std::allocator`.
 
