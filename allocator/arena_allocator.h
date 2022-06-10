@@ -90,7 +90,7 @@ template <class T> T *ArenaAllocator<T>::allocate(const size_t n) const {
 
 template <class T>
 void ArenaAllocator<T>::deallocate(T *const p, size_t s) const noexcept {
-  // unpoison the allocation.
+  // poison the allocation.
   ASAN_POISON_MEMORY_REGION(p, s * sizeof(T));
   // NOTE: does not check the allocation size 's' is correct
 }
