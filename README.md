@@ -11,3 +11,9 @@ To build and run the allocator example:
 To build the 'bad unpoisoning' example:
 
    `nmake unpoison && unpoison.exe`
+
+For further information on the shadow bytes and asan see 
+
+[AddressSanitizer: A Fast Address Sanity Checker](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/37752.pdf)
+
+[Microsoft documentation for Sanitizers/Shadow Bytes](https://docs.microsoft.com/en-us/cpp/sanitizers/asan-shadow-bytes?view=msvc-170)
