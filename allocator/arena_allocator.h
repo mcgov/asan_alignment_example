@@ -6,15 +6,16 @@
 #include <stdlib.h> //size_t, malloc, free
 
 /* NOTE: This is a non-thread-safe, completely contrived example to illustrate
- * ASan's alignment requirements. Do not attempt to use this for anything other
- * than this example! */
+   ASan's alignment requirements. Do not attempt to use this for anything other
+   than this example
 
-// The allocator will use a fixed arena and allocate smaller sub-arrays from
-// that storage.
+   The allocator will use a fixed arena and allocate smaller sub-arrays from
+   that storage.
 
-/* A function to calculate the padding needed per allocation. Adding padding per
- * element breaks array iteration (in this scenario). So we will only pad the
- * ends of each array that is allocated. */
+   A function to calculate the padding needed per allocation. Adding padding per
+   element breaks array iteration in this example, so we will only pad the
+   ends of each array that is allocated.
+*/
 
 size_t CalculateSizePlusPadding(size_t allocation_size, size_t padding) {
   size_t combined_size = allocation_size + padding;
@@ -32,17 +33,21 @@ size_t CalculateSizePlusPadding(size_t allocation_size, size_t padding) {
 // keep a non-const cursor for the current data position in the arena.
 // totally contrived, sample-code-only pattern.
 // start is one qword inside the arena.
-size_t arena_cursor = 0x10;
+size_t arena_cursor = sizeof(uint64_t);
 
 template <class T> struct ArenaAllocator {
+
   typedef T value_type;
+
   size_t ArenaSize = 0x1000 * sizeof(value_type);
 
-  // add (at least) a qword of padding per allocation.
-  size_t padding_size = 0x10;
-
   // allocate the aligned arena
-  uint8_t *Arena = (uint8_t *)_aligned_malloc(ArenaSize, 0x10);
+  uint8_t *Arena = (uint8_t *)_aligned_malloc(ArenaSize, 8);
+
+  // add (at least) a qword of padding per allocation.
+  size_t padding_size = sizeof(uint64_t);
+  // more padding will help catch oob accesses if they are
+  // far from the end of the array.
 
   // poison upon construction.
   ArenaAllocator() noexcept { ASAN_POISON_MEMORY_REGION(Arena, ArenaSize); }
@@ -87,6 +92,5 @@ template <class T>
 void ArenaAllocator<T>::deallocate(T *const p, size_t s) const noexcept {
   // unpoison the allocation.
   ASAN_POISON_MEMORY_REGION(p, s * sizeof(T));
-  // NOTE: This will not unpoison the entire allocation if a different
-  // size is passed in than was allocated.
+  // NOTE: does not check the allocation size 's' is correct
 }
