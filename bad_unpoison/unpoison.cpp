@@ -38,7 +38,7 @@ int main() {
   PRINT_SHADOW_MEMORY(array);
   // 30045000  04 f7 f7 f7 f7 f7 f7 f7
 
-  // All of these attempts to unpoison the first few bytes
+  // All of these attempts to poison the first few bytes
   // of the allocation will fail to poison anything.
   ASAN_POISON_MEMORY_REGION(array, 1);
   ASAN_POISON_MEMORY_REGION(array, 2);
